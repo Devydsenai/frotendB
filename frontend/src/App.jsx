@@ -18,6 +18,9 @@ import batmotorLogo from "@/assets/BATMOTORLogo.svg";
 
 const BATMOTOR_USER_ID_KEY = "batmotor-user-id";
 
+/** Painel principal após login (ENTRAR). `/` redireciona para aqui. */
+const DASHBOARD_PATH = "/dashboard";
+
 function ProtectedRoute({ isAuthenticated, children }) {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
@@ -58,7 +61,8 @@ function App() {
   const headerPageTitle = useMemo(() => {
     const p = location.pathname;
     const titles = {
-      "/": "Painel",
+      "/": "Dashboard",
+      [DASHBOARD_PATH]: "Dashboard",
       "/produtos": "Produtos",
       "/estoque": "Estoque",
       "/fornecedores": "Fornecedores",
@@ -67,7 +71,7 @@ function App() {
       "/sistema": "Sistema",
       "/usuarios": "Usuários"
     };
-    return p in titles ? titles[p] : "Painel";
+    return p in titles ? titles[p] : "Dashboard";
   }, [location.pathname]);
 
   const applySessionFromLogin = useMemo(
@@ -150,7 +154,7 @@ function App() {
           }
         });
         setIsAuthenticated(true);
-        navigate("/");
+        navigate(DASHBOARD_PATH, { replace: true });
       },
       logout: () => {
         localStorage.removeItem("batmotor-token");
@@ -194,7 +198,7 @@ function App() {
       <Route
         path="/login"
         element={
-          isAuthenticated ? <Navigate to="/" replace /> : <LoginPage onLogin={authActions.login} />
+          isAuthenticated ? <Navigate to={DASHBOARD_PATH} replace /> : <LoginPage onLogin={authActions.login} />
         }
       />
       <Route path="/cadastro" element={<Navigate to="/login" replace />} />
@@ -246,7 +250,7 @@ function App() {
                     <p className="app-sidebar-section-label">Menu principal</p>
                     <ul className="app-sidebar-nav app-sidebar-nav--estocae">
                       <li>
-                        <NavLink to="/" end className={sidebarNavClass} onClick={() => setMobileNavOpen(false)}>
+                        <NavLink to={DASHBOARD_PATH} end className={sidebarNavClass} onClick={() => setMobileNavOpen(false)}>
                           <i className="ri-home-5-line" aria-hidden />
                           <span className="app-sidebar-label">Dashboard</span>
                         </NavLink>
@@ -383,7 +387,8 @@ function App() {
 
                   <main className="app-body app-body--responsive px-2 px-sm-3 py-3">
                     <Routes>
-                      <Route path="/" element={<DashboardPage />} />
+                      <Route path="/" element={<Navigate to={DASHBOARD_PATH} replace />} />
+                      <Route path="/dashboard" element={<DashboardPage />} />
                       <Route path="/materias-primas" element={<Navigate to="/produtos" replace />} />
                       <Route path="/produtos" element={<ProductsPage />} />
                       <Route path="/estoque" element={<MaterialsPage />} />
@@ -410,7 +415,7 @@ function App() {
                           accountKind === ACCOUNT_KIND.admin || accountKind === ACCOUNT_KIND.manager ? (
                             <UsersPage />
                           ) : (
-                            <Navigate to="/" replace />
+                            <Navigate to={DASHBOARD_PATH} replace />
                           )
                         }
                       />
